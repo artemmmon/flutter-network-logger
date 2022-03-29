@@ -8,25 +8,13 @@ class DioNetworkLogger extends dio.Interceptor {
   final _requests = <dio.RequestOptions, NetworkEvent>{};
 
   DioNetworkLogger({NetworkEventList? eventList})
-      : this.eventList = eventList ?? NetworkLogger.instance;
-
-  @override
-  Future<void> onRequest(
-      dio.RequestOptions options, dio.RequestInterceptorHandler handler) async {
-    super.onRequest(options, handler);
-    eventList.add(_requests[options] = NetworkEvent.now(
-      request: options.toRequest(),
-      error: null,
-      response: null,
-    ));
-    return Future.value(options);
-  }
+      : eventList = eventList ?? NetworkLogger.instance;
 
   @override
   void onResponse(
-    dio.Response response,
-    dio.ResponseInterceptorHandler handler,
-  ) {
+      dio.Response response,
+      dio.ResponseInterceptorHandler handler,
+      ) {
     super.onResponse(response, handler);
     var event = _requests[response.requestOptions];
     if (event != null) {
@@ -59,27 +47,27 @@ class DioNetworkLogger extends dio.Interceptor {
 
 extension _RequestOptionsX on dio.RequestOptions {
   Request toRequest() => Request(
-        uri: uri.toString(),
-        data: data,
-        method: method,
-        headers: Headers(headers.entries.map(
+    uri: uri.toString(),
+    data: data,
+    method: method,
+    headers: Headers(headers.entries.map(
           (kv) => MapEntry(kv.key, '${kv.value}'),
-        )),
-      );
+    )),
+  );
 }
 
 extension _ResponseX on dio.Response {
   Response toResponse() => Response(
-        data: data,
-        statusCode: statusCode ?? -1,
-        statusMessage: statusMessage ?? 'unkown',
-        headers: Headers(
-          headers.map.entries.fold<List<MapEntry<String, String>>>(
-            [],
+    data: data,
+    statusCode: statusCode ?? -1,
+    statusMessage: statusMessage ?? 'unkown',
+    headers: Headers(
+      headers.map.entries.fold<List<MapEntry<String, String>>>(
+        [],
             (p, e) => p..addAll(e.value.map((v) => MapEntry(e.key, v))),
-          ),
-        ),
-      );
+      ),
+    ),
+  );
 }
 
 extension _DioErrorX on dio.DioError {
